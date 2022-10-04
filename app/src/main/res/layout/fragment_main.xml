@@ -25,7 +25,6 @@
         android:layout_marginTop="32dp"
         android:textColor="@color/cardview_dark_background"
         android:textSize="32sp"
-        android:text="rfftt"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
