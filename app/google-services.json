@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "737916432789",
+    "firebase_url": "https://alex-sample-41a38-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "alex-sample-41a38",
+    "storage_bucket": "alex-sample-41a38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737916432789:android:b001ee7bbd36260331c69c",
+        "android_client_info": {
+          "package_name": "com.example.dacha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737916432789-2076ic9bjn2q2iat09mvkhuruc6plht1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCC7OxLVvXxOmd8Yorq-nkjDcaeL9mqy-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737916432789-2076ic9bjn2q2iat09mvkhuruc6plht1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
