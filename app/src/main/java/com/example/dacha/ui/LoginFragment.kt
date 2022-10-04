@@ -1,60 +1,95 @@
 package com.example.dacha.ui
 
+import android.app.Activity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.dacha.R
+import com.example.dacha.databinding.FragmentLoginBinding
+import com.google.firebase.auth.FirebaseAuth
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LoginFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var mAuth: FirebaseAuth;
+
+    private lateinit var email: String
+    private lateinit var password: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+    ): View {
+        _binding = FragmentLoginBinding.inflate(layoutInflater)
+        return binding.root
+
+
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LoginFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LoginFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onStart() {
+        super.onStart()
+        val currentUser = mAuth.currentUser
+        if (currentUser != null) {
+            Log.d("login", "user $currentUser")
+            findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+        } else Log.d("login", "unregistered user")
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mAuth = FirebaseAuth.getInstance()
+
+
+
+        binding.btnConfirm.setOnClickListener {
+            email = binding.etEmail.text.toString()
+            password = binding.etPassword.text.toString()
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(
+                    context, "Enter valid details",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                signInUser(email, password)
+            }
+        }
+
+        binding.btnReg.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+        }
+
+    }
+
+    private fun signInUser(email: String, password: String) {
+        mAuth.signInWithEmailAndPassword(email.trim(), password.trim())
+            .addOnCompleteListener(context as Activity) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Toast.makeText(
+                        context, "Вы вошли под именем $email",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Toast.makeText(
+                        context, "пользователь $email не зарегестрирован.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
