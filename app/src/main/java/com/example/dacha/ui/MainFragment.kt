@@ -27,8 +27,7 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var switcherRef: DatabaseReference
-    private lateinit var temperatureRef: DatabaseReference
+    private lateinit var databaseRef: DatabaseReference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +48,10 @@ class MainFragment : Fragment() {
             dialogProperties.apply {
                 connectionCallback = object : ConnectionCallback { // Optional
                     override fun hasActiveConnection(hasActiveConnection: Boolean) {
+
+                        databaseRef = Firebase.database.reference
                         showProgressBar()
+
                         val temperature = arrayOf(
                             "20°C",
                             "21°C",
@@ -68,24 +70,29 @@ class MainFragment : Fragment() {
                             "34°C",
                             "35°C"
                         )
+                        var heatingTemperature = 0.0
                         binding.numberPicker.apply {
                             maxValue = temperature.size - 1
                             minValue = 0
                             wrapSelectorWheel = false
                             displayedValues = temperature
+                            setOnValueChangedListener { _, _, newVal ->
+                                heatingTemperature = temperature[newVal].dropLast(2).toDouble()
+                            }
                         }
 
 
-                        switcherRef = Firebase.database.getReference("board1/outputs/digital/2")
-                        temperatureRef = Firebase.database.getReference("temperature")
 
                         getTemperature()
 
                         binding.customSwitch.setOnCheckedChangeListener { _, isChecked ->
                             if (isChecked) {
-                                switcherRef.setValue(1)
+                                databaseRef.child("switcher").setValue(1)
+                                databaseRef.child("requiredTemperature").setValue(heatingTemperature)
+                                binding.numberPicker.isEnabled = false
                             } else {
-                                switcherRef.setValue(0)
+                                databaseRef.child("switcher").setValue(0)
+                                binding.numberPicker.isEnabled = true
                             }
                         }
 
@@ -125,7 +132,7 @@ class MainFragment : Fragment() {
     }
 
     private fun getTemperature() {
-        temperatureRef.addValueEventListener(object : ValueEventListener {
+        databaseRef.child("temperature").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val value = snapshot.getValue(Double::class.java)
                 val stringTemp = "$value °C"
