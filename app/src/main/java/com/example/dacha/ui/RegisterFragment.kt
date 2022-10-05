@@ -8,15 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.dacha.NetworkViewModel
 import com.example.dacha.R
 import com.example.dacha.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: NetworkViewModel by activityViewModels()
 
     private lateinit var mAuth: FirebaseAuth
 
@@ -40,21 +46,40 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mAuth = FirebaseAuth.getInstance()
 
+        viewModel.state.observe(viewLifecycleOwner) { status ->
+            when (status.toString()) {
+                "Available" -> {
+                    mAuth = FirebaseAuth.getInstance()
+                    val currentUser = mAuth.currentUser
+                    if (currentUser != null) {
+                        Log.d("login", "user $currentUser")
+                        findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+                    } else Log.d("login", "unregistered user")
 
-
-        binding.btnConfirm.setOnClickListener {
-            email = binding.etEmail.text.toString()
-            password = binding.etPassword.text.toString()
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(
-                    context, "Заполните поля верно!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                signUpUser(email, password)
+                    binding.btnConfirm.setOnClickListener {
+                        email = binding.etEmail.text.toString()
+                        password = binding.etPassword.text.toString()
+                        if (email.isEmpty() || password.isEmpty()) {
+                            Toast.makeText(
+                                context, "Введите корректные данные",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            signUpUser(email, password)
+                        }
+                    }
+                }
+                else -> {
+                    binding.btnConfirm.setOnClickListener {
+                        Toast.makeText(
+                            context, "Нет интернет-соединения",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
+
         }
 
 
