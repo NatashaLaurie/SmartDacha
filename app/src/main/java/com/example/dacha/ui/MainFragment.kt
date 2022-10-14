@@ -1,25 +1,18 @@
 package com.example.dacha.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.example.dacha.R
+import androidx.fragment.app.viewModels
 import com.example.dacha.databinding.FragmentMainBinding
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.example.dacha.util.SharedPrefConstants
+import com.example.dacha.util.UiState
 import dagger.hilt.android.AndroidEntryPoint
-import org.imaginativeworld.oopsnointernet.callbacks.ConnectionCallback
-import org.imaginativeworld.oopsnointernet.dialogs.signal.NoInternetDialogSignal
+
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -27,7 +20,7 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var databaseRef: DatabaseReference
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,113 +32,87 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observe()
+        viewModel.getCurrentTemperature()
 
 
-        NoInternetDialogSignal.Builder(
-            requireActivity(),
-            lifecycle
-        ).apply {
-            dialogProperties.apply {
-                connectionCallback = object : ConnectionCallback { // Optional
-                    override fun hasActiveConnection(hasActiveConnection: Boolean) {
+        val temperature = arrayOf(
+            "20°C",
+            "21°C",
+            "22°C",
+            "23°C",
+            "24°C",
+            "25°C",
+            "26°C",
+            "27°C",
+            "28°C",
+            "29°C",
+            "30°C",
+            "31°C",
+            "32°C",
+            "33°C",
+            "34°C",
+            "35°C"
+        )
+        var heatingTemperature = ""
+        binding.numberPicker.apply {
+            maxValue = temperature.size
+            minValue = 1
+            wrapSelectorWheel = false
+            displayedValues = temperature
+            setOnValueChangedListener { _, _, newVal ->
+                heatingTemperature = temperature[newVal]
+            }
+        }
 
-                        databaseRef = Firebase.database.reference
-                        showProgressBar()
+        val isChecked = viewModel.localPrefs.getBoolean(SharedPrefConstants.SWITCHER_STATUS, false)
+        binding.customSwitch.isChecked = isChecked
+        if (isChecked) {
+            val reqTemp = viewModel.localPrefs.getString(
+                SharedPrefConstants.REQUIRED_TEMPERATURE,
+                ""
+            )
+            binding.numberPicker.apply {
+                value = temperature.indexOf(reqTemp)
+                isEnabled = false
+            }
+            binding.numberPicker.isEnabled = false
+        }
 
-                        val temperature = arrayOf(
-                            "20°C",
-                            "21°C",
-                            "22°C",
-                            "23°C",
-                            "24°C",
-                            "25°C",
-                            "26°C",
-                            "27°C",
-                            "28°C",
-                            "29°C",
-                            "30°C",
-                            "31°C",
-                            "32°C",
-                            "33°C",
-                            "34°C",
-                            "35°C"
-                        )
-                        var heatingTemperature = 0.0
-                        binding.numberPicker.apply {
-                            maxValue = temperature.size - 1
-                            minValue = 0
-                            wrapSelectorWheel = false
-                            displayedValues = temperature
-                            setOnValueChangedListener { _, _, newVal ->
-                                heatingTemperature = temperature[newVal].dropLast(2).toDouble()
-                            }
-                        }
-
-
-
-                        getTemperature()
-
-                        binding.customSwitch.setOnCheckedChangeListener { _, isChecked ->
-                            if (isChecked) {
-                                databaseRef.child("switcher").setValue(1)
-                                databaseRef.child("requiredTemperature").setValue(heatingTemperature)
-                                binding.numberPicker.isEnabled = false
-                            } else {
-                                databaseRef.child("switcher").setValue(0)
-                                binding.numberPicker.isEnabled = true
-                            }
-                        }
-
-                        binding.btnBack.setOnClickListener {
-                            Firebase.auth.signOut()
-                            findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
-                        }
-                    }
+        binding.customSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.apply {
+                    turnOnHeat()
+                    setRequireTemperature(heatingTemperature)
                 }
-
-                cancelable = false // Optional
-                noInternetConnectionTitle = "Нет интернета" // Optional
-                noInternetConnectionMessage =
-                    "Проверьте интернет-подключение и попробуйте снова." // Optional
-                showInternetOnButtons = true // Optional
-                pleaseTurnOnText = "Плиз включите" // Optional
-                wifiOnButtonText = "Wifi" // Optional
-                mobileDataOnButtonText = "Моб. данные" // Optional
-
-                onAirplaneModeTitle = "Нет интернета" // Optional
-                onAirplaneModeMessage = "Вы включили режим полёта." // Optional
-                pleaseTurnOffText = "Плиз отключите" // Optional
-                airplaneModeOffButtonText = "Режим полёта" // Optional
-                showAirplaneModeOffButtons = true // Optional
+                binding.numberPicker.isEnabled = false
+            } else {
+                viewModel.turnOffHeat()
+                binding.numberPicker.isEnabled = true
             }
-        }.build()
-
+        }
 
     }
 
-    private fun hideProgressBar() {
-        binding.paginationProgressBar.visibility = View.INVISIBLE
-    }
+    private fun observe() {
+        viewModel.currentTemperature.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    binding.tvTemp.text = ""
+                    binding.paginationProgressBar.visibility = View.VISIBLE
+                }
+                is UiState.Failure -> {
+                    binding.tvTemp.text = state.error
+                    binding.paginationProgressBar.visibility = View.INVISIBLE
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
 
-    private fun showProgressBar() {
-        binding.paginationProgressBar.visibility = View.VISIBLE
-    }
-
-    private fun getTemperature() {
-        databaseRef.child("temperature").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val value = snapshot.getValue(Double::class.java)
-                val stringTemp = "$value °C"
-                binding.tvTemp.text = stringTemp
-                hideProgressBar()
-                Log.d("mainFragment", "$value")
+                }
+                is UiState.Success -> {
+                    binding.tvTemp.text = state.data
+                    binding.paginationProgressBar.visibility = View.INVISIBLE
+                }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("mainFragment", "$error")
-                Toast.makeText(context, "Ошибка при получении данных", Toast.LENGTH_SHORT).show()
-            }
-        })
+        }
     }
 
     override fun onDestroyView() {
