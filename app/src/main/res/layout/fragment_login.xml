@@ -4,18 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:padding="16dp"
-    tools:context=".ui.RegisterFragment">
+    tools:context=".ui.auth.LoginFragment">
 
     <TextView
         android:id="@+id/tVWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
-        android:fontFamily="sans-serif-thin"
+        android:fontFamily="sans-serif"
         android:text="С возвращением!"
-        android:textColor="#9B9B9B"
         android:textSize="32sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +27,6 @@
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
         android:text="Введите пароль, чтобы продолжить"
-        android:textColor="#9B9B9B"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,10 +58,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
-                android:inputType="textPersonName"
-                android:maxLength="50"
                 android:layout_height="wrap_content"
-                android:hint="Логин" />
+                android:hint="@string/hint_login"
+                android:inputType="textPersonName"
+                android:maxLength="50" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -85,52 +82,38 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Пароль"
+                android:hint="@string/hint_password"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btnConfirm"
+        <RelativeLayout
+            android:id="@+id/button_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:text="Войти"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/eTPasswordLayout" />
+            app:layout_constraintTop_toBottomOf="@id/eTPasswordLayout">
 
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login" />
+
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="16dp"
+                android:elevation="10dp"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Ещё не зарегистрировались?"
-        android:textColor="#9B9B9B"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btnReg" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnReg"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        android:text="Регистрация"
-        android:textColor="@color/purple_200"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,14 +7,11 @@
     tools:context=".ui.MainFragment"
     android:padding="16dp">
 
-    <ImageButton
+    <ImageView
         android:contentDescription="button_back"
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
         android:src="@drawable/ic_baseline_exit_to_app_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +22,6 @@
         android:layout_height="wrap_content"
         android:text="Температура на даче сейчас:"
         android:layout_marginTop="32dp"
-        android:textColor="@color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +43,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:textColor="@color/black"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -57,9 +52,9 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="56dp"
         android:textSize="32sp"
-        android:textColor="@color/black"
+        android:gravity="center"
         android:text="Make dacha warm again!"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,19 +64,21 @@
         android:id="@+id/tvTempPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Температура нагрева:"
         android:layout_marginTop="32dp"
-        android:textColor="@color/black"
+        android:text="Температура нагрева: "
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
 
-    <NumberPicker
+    <com.shawnlin.numberpicker.NumberPicker
         android:id="@+id/numberPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        app:np_dividerDistance="64dp"
+        app:np_itemSpacing="16dp"
+        app:np_orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTempPicker" />
