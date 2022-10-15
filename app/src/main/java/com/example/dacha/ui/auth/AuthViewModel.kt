@@ -24,12 +24,12 @@ class AuthViewModel @Inject constructor(
         repository.logIn(
             email,
             password
-        ){
+        ) {
             _login.value = it
         }
     }
 
-    fun getSession(result: (String?) -> Unit){
+    fun getSession(result: (String?) -> Unit) {
         repository.getSession(result)
     }
 }

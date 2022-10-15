@@ -1,6 +1,5 @@
 package com.example.dacha.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,8 @@ import com.example.dacha.databinding.FragmentMainBinding
 import com.example.dacha.util.SharedPrefConstants
 import com.example.dacha.util.UiState
 import dagger.hilt.android.AndroidEntryPoint
+import org.imaginativeworld.oopsnointernet.callbacks.ConnectionCallback
+import org.imaginativeworld.oopsnointernet.dialogs.signal.NoInternetDialogSignal
 
 
 @AndroidEntryPoint
@@ -32,10 +33,36 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // No Internet Dialog: Signal
+        NoInternetDialogSignal.Builder(
+            requireActivity(),
+            lifecycle
+        ).apply {
+            dialogProperties.apply {
+                connectionCallback = object : ConnectionCallback { // Optional
+                    override fun hasActiveConnection(hasActiveConnection: Boolean) {
+                    }
+                }
+                cancelable = false // Optional
+                noInternetConnectionTitle = "Нет интернета" // Optional
+                noInternetConnectionMessage =
+                    "Проверьте пж интернет подключение и попробуйте снова." // Optional
+                showInternetOnButtons = true // Optional
+                pleaseTurnOnText = "Плиз верните интернет" // Optional
+                wifiOnButtonText = "Wifi" // Optional
+                mobileDataOnButtonText = "Моб. данные" // Optional
+
+                onAirplaneModeTitle = "Нет интернета" // Optional
+                onAirplaneModeMessage = "Вы включили режим полёта." // Optional
+                pleaseTurnOffText = "Плиз отключите" // Optional
+                airplaneModeOffButtonText = "Режим полёта" // Optional
+                showAirplaneModeOffButtons = true // Optional
+            }
+        }.build()
+
         observe()
         viewModel.getCurrentTemperature()
-
-
         val temperature = arrayOf(
             "20°C",
             "21°C",
@@ -65,7 +92,10 @@ class MainFragment : Fragment() {
             }
         }
 
-        val isChecked = viewModel.localPrefs.getBoolean(SharedPrefConstants.SWITCHER_STATUS, false)
+        val isChecked = viewModel.localPrefs.getBoolean(
+            SharedPrefConstants.SWITCHER_STATUS,
+            false
+        )
         binding.customSwitch.isChecked = isChecked
         if (isChecked) {
             val reqTemp = viewModel.localPrefs.getString(

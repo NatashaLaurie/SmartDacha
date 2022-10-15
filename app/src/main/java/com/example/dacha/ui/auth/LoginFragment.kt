@@ -1,6 +1,6 @@
 package com.example.dacha.ui.auth
 
-import android.content.res.Resources
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +13,8 @@ import com.example.dacha.R
 import com.example.dacha.databinding.FragmentLoginBinding
 import com.example.dacha.util.UiState
 import dagger.hilt.android.AndroidEntryPoint
+import org.imaginativeworld.oopsnointernet.callbacks.ConnectionCallback
+import org.imaginativeworld.oopsnointernet.dialogs.signal.NoInternetDialogSignal
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -33,6 +35,36 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // No Internet Dialog: Signal
+        NoInternetDialogSignal.Builder(
+            requireActivity(),
+            lifecycle
+        ).apply {
+            dialogProperties.apply {
+                connectionCallback = object : ConnectionCallback { // Optional
+                    override fun hasActiveConnection(hasActiveConnection: Boolean) {
+
+                    }
+                }
+
+                cancelable = false // Optional
+                noInternetConnectionTitle = "Нет интернета" // Optional
+                noInternetConnectionMessage =
+                    "Проверьте пж интернет подключение и попробуйте снова." // Optional
+                showInternetOnButtons = true // Optional
+                pleaseTurnOnText = "Плиз верните интернет" // Optional
+                wifiOnButtonText = "Wifi" // Optional
+                mobileDataOnButtonText = "Моб. данные" // Optional
+
+                onAirplaneModeTitle = "Нет интернета" // Optional
+                onAirplaneModeMessage = "Вы включили режим полёта." // Optional
+                pleaseTurnOffText = "Плиз отключите" // Optional
+                airplaneModeOffButtonText = "Режим полёта" // Optional
+                showAirplaneModeOffButtons = true // Optional
+            }
+        }.build()
+
         observe()
         binding.btnLogin.setOnClickListener {
             if (validate()) {
@@ -74,9 +106,9 @@ class LoginFragment : Fragment() {
             isValid = false
             if (binding.etPassword.text.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "Введите логин и пароль", Toast.LENGTH_LONG).show()
-            } else Toast.makeText(requireContext(), R.string.invalid_login, Toast.LENGTH_LONG).show()
-        }
-        else if (binding.etPassword.text.isNullOrEmpty()) {
+            } else Toast.makeText(requireContext(), R.string.invalid_login, Toast.LENGTH_LONG)
+                .show()
+        } else if (binding.etPassword.text.isNullOrEmpty()) {
             isValid = false
             Toast.makeText(requireContext(), R.string.invalid_pass, Toast.LENGTH_LONG).show()
         }

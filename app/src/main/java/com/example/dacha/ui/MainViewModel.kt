@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dacha.data.repository.HeatingRepository
 import com.example.dacha.data.repository.SwitcherRepository
-import com.example.dacha.util.SharedPrefConstants
 import com.example.dacha.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -49,7 +48,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun setRequireTemperature(requiredTemp: String) {
-        _requiredTemperature.value = UiState.Loading
         heatingRepository.setRequiredTemperature(requiredTemp) { _requiredTemperature.value = it }
     }
 

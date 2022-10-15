@@ -2,7 +2,6 @@ package com.example.dacha.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.dacha.util.SharedPrefConstants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
