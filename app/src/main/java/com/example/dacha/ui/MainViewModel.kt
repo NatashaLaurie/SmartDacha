@@ -1,34 +1,34 @@
 package com.example.dacha.ui
 
+import android.app.Application
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.work.*
 import com.example.dacha.data.repository.HeatingRepository
 import com.example.dacha.data.repository.SwitcherRepository
 import com.example.dacha.util.UiState
+import com.example.dacha.worker.FirebaseWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val switcherRepository: SwitcherRepository,
-    val heatingRepository: HeatingRepository,
-    val localPrefs: SharedPreferences
+    private val switcherRepository: SwitcherRepository,
+    private val heatingRepository: HeatingRepository,
+    val localPrefs: SharedPreferences,
+    application: Application
 ) : ViewModel() {
+    private val workManager = WorkManager.getInstance(application)
 
-    private val _currentTemperature = MutableLiveData<UiState<String>>()
-    val currentTemperature: LiveData<UiState<String>>
+    private val _currentTemperature = MutableLiveData<UiState<Float>>()
+    val currentTemperature: LiveData<UiState<Float>>
         get() = _currentTemperature
 
-    private val _requiredTemperature = MutableLiveData<UiState<Pair<String, String>>>()
-    val requiredTemperature: LiveData<UiState<Pair<String, String>>>
-        get() = _requiredTemperature
-
-    private val _switcherStatus = MutableLiveData<UiState<String>>()
-    val switcherStatus: LiveData<UiState<String>>
-        get() = _switcherStatus
-
+    private val requiredTemperature = MutableLiveData<UiState<Pair<String, String>>>()
+    private val switcherStatus = MutableLiveData<UiState<String>>()
 
     fun getCurrentTemperature() {
         _currentTemperature.value = UiState.Loading
@@ -37,18 +37,39 @@ class MainViewModel @Inject constructor(
 
     fun turnOffHeat() {
         switcherRepository.turnOffHeat {
-            _switcherStatus.value = it
+            switcherStatus.value = it
         }
     }
 
     fun turnOnHeat() {
         switcherRepository.turnOnHeat {
-            _switcherStatus.value = it
+            switcherStatus.value = it
         }
     }
 
     fun setRequireTemperature(requiredTemp: String) {
-        heatingRepository.setRequiredTemperature(requiredTemp) { _requiredTemperature.value = it }
+        heatingRepository.setRequiredTemperature(requiredTemp) { requiredTemperature.value = it }
+    }
+
+    private val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+
+    fun startCheckingStatus() {
+        val workRequest =
+            OneTimeWorkRequestBuilder<FirebaseWorker>()
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .build()
+        workManager.enqueue(workRequest)
+    }
+
+    fun stopCheckingStatus() {
+        workManager.cancelAllWork()
     }
 
 }

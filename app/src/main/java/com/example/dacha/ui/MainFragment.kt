@@ -1,6 +1,8 @@
 package com.example.dacha.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +24,7 @@ class MainFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var heatingTemperature: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,24 +77,8 @@ class MainFragment : Fragment() {
             "27°C",
             "28°C",
             "29°C",
-            "30°C",
-            "31°C",
-            "32°C",
-            "33°C",
-            "34°C",
-            "35°C"
+            "30°C"
         )
-        var heatingTemperature = ""
-        binding.numberPicker.apply {
-            maxValue = temperature.size
-            minValue = 1
-            wrapSelectorWheel = false
-            displayedValues = temperature
-            setOnValueChangedListener { _, _, newVal ->
-                heatingTemperature = temperature[newVal]
-            }
-        }
-
         val isChecked = viewModel.localPrefs.getBoolean(
             SharedPrefConstants.SWITCHER_STATUS,
             false
@@ -102,28 +89,57 @@ class MainFragment : Fragment() {
                 SharedPrefConstants.REQUIRED_TEMPERATURE,
                 ""
             )
+
             binding.numberPicker.apply {
+                maxValue = temperature.size - 1
+                minValue = 0
                 value = temperature.indexOf(reqTemp)
+                displayedValues = temperature
+                heatingTemperature = reqTemp!!
                 isEnabled = false
             }
-            binding.numberPicker.isEnabled = false
+        } else {
+            heatingTemperature = temperature[(temperature.size - 1) / 2]
+            binding.numberPicker.apply {
+                maxValue = temperature.size - 1
+                minValue = 0
+                value = maxValue / 2
+                wrapSelectorWheel = false
+                displayedValues = temperature
+            }
         }
 
-        binding.customSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.apply {
-                    turnOnHeat()
-                    setRequireTemperature(heatingTemperature)
+        binding.numberPicker.setOnValueChangedListener { _, _, newVal ->
+            heatingTemperature = temperature[newVal]
+            Log.d("heatingTemperature", heatingTemperature)
+        }
+
+        binding.customSwitch.setOnClickListener {
+            if (binding.customSwitch.isChecked) {
+                Log.d("switch", "$currentTemp  ${heatingTemperature.dropLast(2).toInt()}")
+                if (currentTemp > heatingTemperature.dropLast(2).toInt()) {
+                    Toast.makeText(requireContext(), "И так тепло, зачем?", Toast.LENGTH_LONG)
+                        .show()
+                    binding.customSwitch.isChecked = false
+                } else {
+                    viewModel.apply {
+                        turnOnHeat()
+                        setRequireTemperature(heatingTemperature)
+                    }
+                    binding.numberPicker.isEnabled = false
+                    viewModel.startCheckingStatus()
                 }
-                binding.numberPicker.isEnabled = false
             } else {
                 viewModel.turnOffHeat()
                 binding.numberPicker.isEnabled = true
+                viewModel.stopCheckingStatus()
             }
         }
 
     }
 
+    var currentTemp: Float = 0f
+    @SuppressLint("SetTextI18n")
     private fun observe() {
         viewModel.currentTemperature.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -138,7 +154,8 @@ class MainFragment : Fragment() {
 
                 }
                 is UiState.Success -> {
-                    binding.tvTemp.text = state.data
+                    currentTemp = state.data
+                    binding.tvTemp.text = "${String.format("%.1f", currentTemp)} °C"
                     binding.paginationProgressBar.visibility = View.INVISIBLE
                 }
             }

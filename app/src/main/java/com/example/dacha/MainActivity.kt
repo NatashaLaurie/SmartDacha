@@ -20,6 +20,5 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val firebaseMessaging = FirebaseMessaging.getInstance()
         firebaseMessaging.subscribeToTopic("heat_status")
-
     }
 }

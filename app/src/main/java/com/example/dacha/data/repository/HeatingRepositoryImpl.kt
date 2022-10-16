@@ -14,7 +14,7 @@ class HeatingRepositoryImpl(
     val appPreferences: SharedPreferences
 ) : HeatingRepository {
 
-    override fun getCurrentTemperature(result: (UiState<String>) -> Unit) {
+    override fun getCurrentTemperature(result: (UiState<Float>) -> Unit) {
         database.child(FireBaseFields.CURRENT_TEMPERATURE)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -24,8 +24,7 @@ class HeatingRepositoryImpl(
                             UiState.Loading
                         )
                     } else {
-                        val strTemperature = "${String.format("%.1f", temperature)} °C"
-                        result.invoke(UiState.Success(strTemperature))
+                        result.invoke(UiState.Success(temperature))
                     }
                 }
 
