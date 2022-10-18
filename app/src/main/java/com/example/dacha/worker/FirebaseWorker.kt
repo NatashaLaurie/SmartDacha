@@ -77,8 +77,6 @@ class FirebaseWorker @AssistedInject constructor(
         notification.setSmallIcon(R.drawable.ic_launcher_background)
         val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         notification.setSound(sound)
-        val vibrate = longArrayOf(0, 100, 200, 300)
-        notification.setVibrate(vibrate)
 
         with(NotificationManagerCompat.from(applicationContext)) {
             notify(2, notification.build())

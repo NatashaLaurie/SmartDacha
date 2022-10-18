@@ -11,4 +11,5 @@
     <string name="login">Войти</string>
     <string name="hint_password">Пароль</string>
     <string name="hint_login">Логин</string>
+    <string name="smart_dacha">SMART DACHA</string>
 </resources>

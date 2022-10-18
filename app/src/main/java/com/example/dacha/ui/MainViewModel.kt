@@ -55,6 +55,7 @@ class MainViewModel @Inject constructor(
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
+
     fun startCheckingStatus() {
         val workRequest =
             OneTimeWorkRequestBuilder<FirebaseWorker>()

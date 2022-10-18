@@ -1,27 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="deep_aquamarine">#143C7E6F</color>
-    <color name="y_in_mn_blue">#264D98</color>
-    <color name="dark_jungle_green">#131B26</color>
-    <color name="platinum">#E5E5E5</color>
-    <color name="platinum_light">#0CE5E5E5</color>
 
-    <color name="dark_gunmetal">#1B232E</color>
-
-
-    <color name="primaryColor">#005f63</color>
-    <color name="primaryLightColor">#428d90</color>
-    <color name="primaryDarkColor">#003539</color>
+    <color name="primaryColor">#ff8f00</color>
+    <color name="primaryLightColor">#ffc046</color>
+    <color name="primaryDarkColor">#c56000</color>
+    <color name="secondaryColor">#12252d</color>
+    <color name="secondaryLightColor">#3a4d56</color>
+    <color name="secondaryDarkColor">#000002</color>
     <color name="primaryTextColor">#ffffff</color>
-    <color name="secondaryColor">#80deea</color>
-    <color name="secondaryLightColor">#b4ffff</color>
-    <color name="secondaryDarkColor">#4bacb8</color>
     <color name="secondaryTextColor">#000000</color>
 </resources>

@@ -138,7 +138,8 @@ class MainFragment : Fragment() {
 
     }
 
-    var currentTemp: Float = 0f
+
+    private var currentTemp: Float = 0f
     @SuppressLint("SetTextI18n")
     private fun observe() {
         viewModel.currentTemperature.observe(viewLifecycleOwner) { state ->
@@ -161,7 +162,6 @@ class MainFragment : Fragment() {
             }
         }
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
