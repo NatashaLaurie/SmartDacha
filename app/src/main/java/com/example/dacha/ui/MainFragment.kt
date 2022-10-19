@@ -34,6 +34,7 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -89,7 +90,7 @@ class MainFragment : Fragment() {
                 SharedPrefConstants.REQUIRED_TEMPERATURE,
                 ""
             )
-
+            binding.tvRequiredTemp.text = "$reqTemp цель"
             binding.numberPicker.apply {
                 maxValue = temperature.size - 1
                 minValue = 0
@@ -111,57 +112,53 @@ class MainFragment : Fragment() {
 
         binding.numberPicker.setOnValueChangedListener { _, _, newVal ->
             heatingTemperature = temperature[newVal]
-            Log.d("heatingTemperature", heatingTemperature)
         }
 
         binding.customSwitch.setOnClickListener {
             if (binding.customSwitch.isChecked) {
-                Log.d("switch", "$currentTemp  ${heatingTemperature.dropLast(2).toInt()}")
-                if (currentTemp > heatingTemperature.dropLast(2).toInt()) {
-                    Toast.makeText(requireContext(), "И так тепло, зачем?", Toast.LENGTH_LONG)
-                        .show()
-                    binding.customSwitch.isChecked = false
-                } else {
-                    viewModel.apply {
-                        turnOnHeat()
-                        setRequireTemperature(heatingTemperature)
-                    }
-                    binding.numberPicker.isEnabled = false
-                    viewModel.startCheckingStatus()
+                viewModel.apply {
+                    turnOnHeat()
+                    setRequireTemperature(heatingTemperature)
                 }
+                binding.tvRequiredTemp.text = "$heatingTemperature цель"
+                binding.numberPicker.isEnabled = false
+                viewModel.startCheckingStatus()
+
             } else {
                 viewModel.turnOffHeat()
                 binding.numberPicker.isEnabled = true
                 viewModel.stopCheckingStatus()
             }
         }
-
     }
 
-
     private var currentTemp: Float = 0f
-    @SuppressLint("SetTextI18n")
+
     private fun observe() {
         viewModel.currentTemperature.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
                     binding.tvTemp.text = ""
-                    binding.paginationProgressBar.visibility = View.VISIBLE
+
                 }
                 is UiState.Failure -> {
                     binding.tvTemp.text = state.error
-                    binding.paginationProgressBar.visibility = View.INVISIBLE
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
 
                 }
                 is UiState.Success -> {
                     currentTemp = state.data
-                    binding.tvTemp.text = "${String.format("%.1f", currentTemp)} °C"
-                    binding.paginationProgressBar.visibility = View.INVISIBLE
+                    binding.circleIndicator.apply {
+                        indeterminateMode = false
+                        startAngle = 0f
+                        setProgressWithAnimation(currentTemp, 1000)
+                    }
+                    binding.tvTemp.text = String.format("%.1f", currentTemp)
                 }
             }
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

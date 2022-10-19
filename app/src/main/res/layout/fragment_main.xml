@@ -22,36 +22,23 @@
 
     <com.mikhaellopez.circularprogressbar.CircularProgressBar
         android:id="@+id/circle_indicator"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_marginTop="32dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:cpb_background_progressbar_color="#b6bbd8"
-        app:cpb_background_progressbar_width="5dp"
+        app:cpb_background_progressbar_width="3dp"
         app:cpb_progress="0"
         app:cpb_progress_max="40"
-        app:cpb_progressbar_color_start="#3f51b5"
-        app:cpb_progressbar_color_end="@color/primaryDarkColor"
-        app:cpb_background_progressbar_color_end="@color/white"
-        app:cpb_background_progressbar_color_start="@color/primaryLightColor"
+        app:cpb_progressbar_color_start="@color/primaryColor"
+        app:cpb_progressbar_color_end="@color/coldIndicator"
         app:cpb_progress_direction="to_right"
-        app:cpb_progressbar_width="8dp"
+        app:cpb_progressbar_width="10dp"
         app:cpb_round_border="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
          />
 
-    <ProgressBar
-        android:id="@+id/paginationProgressBar"
-        style="?attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:background="@android:color/transparent"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/circle_indicator" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/temperature_layout"
@@ -89,7 +76,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/primaryLightColor"
-            android:text="10°C цель"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -97,8 +83,6 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
     <TextView
         android:id="@+id/tvTempPicker"
@@ -109,7 +93,7 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/temperature_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/circle_indicator" />
 
     <com.shawnlin.numberpicker.NumberPicker
         android:id="@+id/numberPicker"
