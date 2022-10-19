@@ -4,53 +4,101 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/secondaryColor"
     tools:context=".ui.MainFragment"
-    android:background="@color/secondaryColor">
+    android:padding="18dp">
 
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Температура на даче сейчас:"
         android:layout_marginTop="32dp"
+        android:text="Температура на даче сейчас:"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/circle_indicator"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:cpb_background_progressbar_color="#b6bbd8"
+        app:cpb_background_progressbar_width="5dp"
+        app:cpb_progress="0"
+        app:cpb_progress_max="40"
+        app:cpb_progressbar_color_start="#3f51b5"
+        app:cpb_progressbar_color_end="@color/primaryDarkColor"
+        app:cpb_background_progressbar_color_end="@color/white"
+        app:cpb_background_progressbar_color_start="@color/primaryLightColor"
+        app:cpb_progress_direction="to_right"
+        app:cpb_progressbar_width="8dp"
+        app:cpb_round_border="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+         />
+
     <ProgressBar
         android:id="@+id/paginationProgressBar"
         style="?attr/progressBarStyle"
         android:layout_width="wrap_content"
-        android:layout_marginTop="32dp"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
+        android:layout_marginTop="32dp"
         android:background="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintHorizontal_bias="0.5" />
-    <TextView
-        android:id="@+id/tvTemp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:textSize="32sp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
+        app:layout_constraintTop_toBottomOf="@id/circle_indicator" />
 
-    <TextView
-        android:id="@+id/button"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/temperature_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:textSize="32sp"
-        android:gravity="center"
-        android:text="Make dacha warm again!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTemp" />
+        app:layout_constraintBottom_toBottomOf="@id/circle_indicator"
+        app:layout_constraintEnd_toEndOf="@id/circle_indicator"
+        app:layout_constraintStart_toStartOf="@id/circle_indicator"
+        app:layout_constraintTop_toTopOf="@id/circle_indicator">
+
+        <TextView
+            android:id="@+id/tvDegree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/c"
+            android:textSize="32sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="10"
+            android:textSize="72sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDegree" />
+        <TextView
+            android:id="@+id/tvRequiredTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/primaryLightColor"
+            android:text="10°C цель"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTemp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     <TextView
         android:id="@+id/tvTempPicker"
@@ -61,29 +109,28 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/temperature_layout" />
 
     <com.shawnlin.numberpicker.NumberPicker
         android:id="@+id/numberPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        app:np_dividerDistance="64dp"
-        app:np_itemSpacing="16dp"
-        app:np_orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTempPicker" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTempPicker"
+        app:np_dividerDistance="64dp"
+        app:np_itemSpacing="16dp"
+        app:np_orientation="horizontal" />
 
     <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/customSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/customSwitch"
+        android:thumb="@drawable/thumb"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/numberPicker"
-        app:track="@drawable/track"
-        android:thumb="@drawable/thumb"
-        />
+        app:track="@drawable/track" />
 </androidx.constraintlayout.widget.ConstraintLayout>
