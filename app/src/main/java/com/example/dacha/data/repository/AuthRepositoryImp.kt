@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class AuthRepositoryImp(
     val auth: FirebaseAuth,
-    val appPreferences: SharedPreferences
+    private val appPreferences: SharedPreferences
 
 ): AuthRepository {
 
@@ -20,7 +20,7 @@ class AuthRepositoryImp(
                     appPreferences.edit().putString(SharedPrefConstants.USER_SESSION,user).apply()
                 }
             }.addOnFailureListener {
-                result.invoke(UiState.Failure("Authentication failed, Check email and password"))
+                result.invoke(UiState.Failure(it.message))
             }
     }
 

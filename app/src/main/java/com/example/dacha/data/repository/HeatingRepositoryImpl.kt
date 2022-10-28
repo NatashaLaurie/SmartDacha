@@ -10,8 +10,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 
 class HeatingRepositoryImpl(
-    val database: DatabaseReference,
-    val appPreferences: SharedPreferences
+    private val database: DatabaseReference,
+    private val appPreferences: SharedPreferences
 ) : HeatingRepository {
 
     override fun getCurrentTemperature(result: (UiState<Float>) -> Unit) {

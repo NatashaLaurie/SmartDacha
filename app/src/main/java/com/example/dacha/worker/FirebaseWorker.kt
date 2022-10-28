@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -14,6 +15,8 @@ import androidx.work.WorkerParameters
 import com.example.dacha.MainActivity
 import com.example.dacha.R
 import com.example.dacha.util.Constants
+import com.example.dacha.util.FireBaseFields
+import com.example.dacha.util.SharedPrefConstants
 import com.google.firebase.database.DatabaseReference
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,13 +28,13 @@ import kotlinx.coroutines.withContext
 class FirebaseWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
-    val database: DatabaseReference
+    private val database: DatabaseReference,
+    private val localPrefs: SharedPreferences
 ) : CoroutineWorker(context, workerParameters) {
     private val TAG = "FirebaseWorker"
-    private val docPath = "readyStatus"
 
     private suspend fun getData() = withContext(Dispatchers.IO) {
-        database.child(docPath)
+        database.child(FireBaseFields.READY_STATUS)
             .get()
             .await()
             .value
@@ -70,11 +73,11 @@ class FirebaseWorker @AssistedInject constructor(
                 .apply {
                     setContentIntent(pendingIntent)
                 }
-        notification.setContentTitle("ONE TIME WORK")
-        notification.setContentText(Constants.ONETIME_WORK_DESCRIPTION)
-        notification.priority = NotificationCompat.PRIORITY_HIGH
+        val achievedTemperature = localPrefs.getString(SharedPrefConstants.REQUIRED_TEMPERATURE, "")
+        notification.setContentTitle("Температура $achievedTemperature достигнута.")
+        notification.setContentText("Батареи переведены в автономный режим.")
         notification.setCategory(NotificationCompat.CATEGORY_ALARM)
-        notification.setSmallIcon(R.drawable.ic_launcher_background)
+        notification.setSmallIcon(R.drawable.ic_splash)
         val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         notification.setSound(sound)
 

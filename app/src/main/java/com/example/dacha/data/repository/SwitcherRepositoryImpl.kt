@@ -7,8 +7,8 @@ import com.example.dacha.util.UiState
 import com.google.firebase.database.DatabaseReference
 
 class SwitcherRepositoryImpl(
-    val database: DatabaseReference,
-    val appPreferences: SharedPreferences
+    private val database: DatabaseReference,
+    private val appPreferences: SharedPreferences
 ) : SwitcherRepository {
     override fun turnOnHeat(result: (UiState<String>) -> Unit) {
         database.child(FireBaseFields.SWITCHER_HEAT)

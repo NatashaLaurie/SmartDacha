@@ -2,7 +2,6 @@ package com.example.dacha.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import androidx.fragment.app.viewModels
 import com.example.dacha.databinding.FragmentMainBinding
 import com.example.dacha.util.SharedPrefConstants
 import com.example.dacha.util.UiState
+import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import org.imaginativeworld.oopsnointernet.callbacks.ConnectionCallback
 import org.imaginativeworld.oopsnointernet.dialogs.signal.NoInternetDialogSignal
@@ -68,6 +68,8 @@ class MainFragment : Fragment() {
         observe()
         viewModel.getCurrentTemperature()
         val temperature = arrayOf(
+            "18°C",
+            "19°C",
             "20°C",
             "21°C",
             "22°C",
@@ -78,7 +80,9 @@ class MainFragment : Fragment() {
             "27°C",
             "28°C",
             "29°C",
-            "30°C"
+            "30°C",
+            "31°C",
+            "32°C"
         )
         val isChecked = viewModel.localPrefs.getBoolean(
             SharedPrefConstants.SWITCHER_STATUS,
@@ -86,14 +90,13 @@ class MainFragment : Fragment() {
         )
         binding.customSwitch.isChecked = isChecked
         if (isChecked) {
-            val reqTemp = viewModel.localPrefs.getString(
-                SharedPrefConstants.REQUIRED_TEMPERATURE,
-                ""
-            )
+            val reqTemp =
+                viewModel.localPrefs.getString(SharedPrefConstants.REQUIRED_TEMPERATURE, "")
             binding.tvRequiredTemp.text = "$reqTemp цель"
             binding.numberPicker.apply {
                 maxValue = temperature.size - 1
                 minValue = 0
+                wrapSelectorWheel = false
                 value = temperature.indexOf(reqTemp)
                 displayedValues = temperature
                 heatingTemperature = reqTemp!!
@@ -114,8 +117,8 @@ class MainFragment : Fragment() {
             heatingTemperature = temperature[newVal]
         }
 
-        binding.customSwitch.setOnClickListener {
-            if (binding.customSwitch.isChecked) {
+        binding.customSwitch.setOnCheckedChangeListener{ _, isChecked ->
+            if (isChecked) {
                 viewModel.apply {
                     turnOnHeat()
                     setRequireTemperature(heatingTemperature)
@@ -123,11 +126,10 @@ class MainFragment : Fragment() {
                 binding.tvRequiredTemp.text = "$heatingTemperature цель"
                 binding.numberPicker.isEnabled = false
                 viewModel.startCheckingStatus()
-
-            } else {
-                viewModel.turnOffHeat()
+            } else { viewModel.turnOffHeat()
                 binding.numberPicker.isEnabled = true
                 viewModel.stopCheckingStatus()
+                binding.tvRequiredTemp.text = "" // The toggle is disabled
             }
         }
     }
@@ -139,17 +141,22 @@ class MainFragment : Fragment() {
             when (state) {
                 is UiState.Loading -> {
                     binding.tvTemp.text = ""
+                    binding.animationView.visibility = View.VISIBLE
 
                 }
                 is UiState.Failure -> {
                     binding.tvTemp.text = state.error
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
+                    binding.animationView.visibility = View.INVISIBLE
 
                 }
                 is UiState.Success -> {
+                    binding.animationView.visibility = View.INVISIBLE
                     currentTemp = state.data
                     binding.circleIndicator.apply {
-                        indeterminateMode = false
+                        progressBarColorDirection = if (currentTemp < 0) {
+                            CircularProgressBar.GradientDirection.BOTTOM_TO_END
+                        } else CircularProgressBar.GradientDirection.TOP_TO_BOTTOM
                         startAngle = 0f
                         setProgressWithAnimation(currentTemp, 1000)
                     }

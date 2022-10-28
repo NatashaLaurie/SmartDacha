@@ -9,6 +9,9 @@
     <color name="secondaryDarkColor">#000002</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
-    <color name="coldIndicator">#00FFFF</color>
+    <color name="coldIndicator">#6713D2</color>
+    <color name="hotIndicator">#F35F33</color>
+    <color name="switcherColor">#b6bbd8</color>
+
 
 </resources>

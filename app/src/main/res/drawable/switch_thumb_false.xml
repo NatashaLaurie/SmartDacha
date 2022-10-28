@@ -2,12 +2,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item >
         <shape android:shape="oval">
-            <solid android:color="#bdbdbd"/>
-            <size android:height="100dp"
-                android:width="100dp"/>
-            <stroke android:width="2sp"
-                android:color="@color/flat_grey_dark_2"
-                />
+            <solid android:color="@color/switcherColor"/>
+            <size android:height="80dp"
+                android:width="80dp"/>
 
         </shape>
     </item>

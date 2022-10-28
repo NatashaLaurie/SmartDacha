@@ -51,15 +51,14 @@ class MainViewModel @Inject constructor(
         heatingRepository.setRequiredTemperature(requiredTemp) { requiredTemperature.value = it }
     }
 
-    private val constraints = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
-
-
     fun startCheckingStatus() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
         val workRequest =
             OneTimeWorkRequestBuilder<FirebaseWorker>()
                 .setConstraints(constraints)
+                //.setInitialDelay(1, TimeUnit.MINUTES)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
                     OneTimeWorkRequest.MIN_BACKOFF_MILLIS,

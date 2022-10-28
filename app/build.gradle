@@ -60,25 +60,24 @@ dependencies {
     // Navigation Components
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
-    
 
+    implementation 'com.kyleduo.switchbutton:library:2.1.0'
     implementation 'androidx.core:core-splashscreen:1.0.0'
 
+    def lottieVersion = "5.2.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
-    implementation 'com.google.android.material:material:1.6.1'
-
+    implementation 'com.google.android.material:material:1.7.0'
     implementation 'org.imaginativeworld.oopsnointernet:oopsnointernet:2.0.0'
-
     implementation 'io.github.ShawnLin013:number-picker:2.4.13'
-    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
 
     // WorkManager
     implementation "androidx.work:work-runtime-ktx:2.7.1"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     implementation 'com.mikhaellopez:circularprogressbar:3.1.0'
 }
