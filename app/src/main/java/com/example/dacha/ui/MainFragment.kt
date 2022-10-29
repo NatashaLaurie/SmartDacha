@@ -2,6 +2,7 @@ package com.example.dacha.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.dacha.databinding.FragmentMainBinding
-import com.example.dacha.util.SharedPrefConstants
 import com.example.dacha.util.UiState
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +24,7 @@ class MainFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var heatingTemperature: String
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,78 +64,42 @@ class MainFragment : Fragment() {
                 showAirplaneModeOffButtons = true // Optional
             }
         }.build()
-
         observe()
         viewModel.getCurrentTemperature()
-        val temperature = arrayOf(
-            "18°C",
-            "19°C",
-            "20°C",
-            "21°C",
-            "22°C",
-            "23°C",
-            "24°C",
-            "25°C",
-            "26°C",
-            "27°C",
-            "28°C",
-            "29°C",
-            "30°C",
-            "31°C",
-            "32°C"
-        )
-        val isChecked = viewModel.localPrefs.getBoolean(
-            SharedPrefConstants.SWITCHER_STATUS,
-            false
-        )
-        binding.customSwitch.isChecked = isChecked
-        if (isChecked) {
-            val reqTemp =
-                viewModel.localPrefs.getString(SharedPrefConstants.REQUIRED_TEMPERATURE, "")
-            binding.tvRequiredTemp.text = "$reqTemp цель"
-            binding.numberPicker.apply {
-                maxValue = temperature.size - 1
-                minValue = 0
-                wrapSelectorWheel = false
-                value = temperature.indexOf(reqTemp)
-                displayedValues = temperature
-                heatingTemperature = reqTemp!!
-                isEnabled = false
-            }
-        } else {
-            heatingTemperature = temperature[(temperature.size - 1) / 2]
-            binding.numberPicker.apply {
-                maxValue = temperature.size - 1
-                minValue = 0
-                value = maxValue / 2
-                wrapSelectorWheel = false
-                displayedValues = temperature
-            }
+
+        binding.numberPicker.apply {
+            maxValue = temperature.size - 1
+            minValue = 0
+            wrapSelectorWheel = false
+            value = maxValue / 2
+            displayedValues = temperature
         }
 
-        binding.numberPicker.setOnValueChangedListener { _, _, newVal ->
-            heatingTemperature = temperature[newVal]
-        }
-
-        binding.customSwitch.setOnCheckedChangeListener{ _, isChecked ->
+        binding.customSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 viewModel.apply {
-                    turnOnHeat()
-                    setRequireTemperature(heatingTemperature)
+                    Log.d("heatingTemperature", heatingTemperature)
+                    turnOnHeat(heatingTemperature)
+                    //setRequireTemperature(heatingTemperature)
+                    startCheckingStatus()
                 }
-                binding.tvRequiredTemp.text = "$heatingTemperature цель"
+
+                Log.d("heatingTemperature", heatingTemperature)
+                binding.numberPicker.value = temperature.indexOf(heatingTemperature)
                 binding.numberPicker.isEnabled = false
-                viewModel.startCheckingStatus()
-            } else { viewModel.turnOffHeat()
-                binding.numberPicker.isEnabled = true
+            } else {
+                viewModel.turnOffHeat()
                 viewModel.stopCheckingStatus()
-                binding.tvRequiredTemp.text = "" // The toggle is disabled
+                binding.tvRequiredTemp.text = ""
+                binding.numberPicker.isEnabled = true
             }
         }
     }
 
+    private var heatingTemperature = ""
     private var currentTemp: Float = 0f
 
+    @SuppressLint("SetTextI18n")
     private fun observe() {
         viewModel.currentTemperature.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -164,7 +128,57 @@ class MainFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.switcherStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                is UiState.Loading -> {
+                    binding.numberPicker.isEnabled = false
+                    binding.aVPicker.visibility = View.VISIBLE
+                }
+                is UiState.Failure -> {
+                    Toast.makeText(requireContext(), status.error, Toast.LENGTH_LONG).show()
+                    binding.aVPicker.visibility = View.INVISIBLE
+                }
+                is UiState.Success -> {
+                    heatingTemperature = status.data.second
+                    Log.d("success","${status.data.second} vs $$heatingTemperature" )
+                    binding.aVPicker.visibility = View.INVISIBLE
+                    if (status.data.first == "1") {
+                        binding.tvRequiredTemp.text = "${status.data.second} цель"
+                        binding.customSwitch.isChecked = true
+                        Log.d("pickerVal","${status.data.second} vs $heatingTemperature" )
+                    } else {
+                        binding.customSwitch.isChecked = false
+                        binding.numberPicker.isEnabled = true
+                        binding.numberPicker.setOnValueChangedListener { _, _, newVal ->
+                            heatingTemperature = temperature[newVal]
+                            Log.d("newVal", heatingTemperature)
+                        }
+                    }
+                }
+            }
+
+        }
     }
+
+
+    private val temperature = arrayOf(
+        "18°C",
+        "19°C",
+        "20°C",
+        "21°C",
+        "22°C",
+        "23°C",
+        "24°C",
+        "25°C",
+        "26°C",
+        "27°C",
+        "28°C",
+        "29°C",
+        "30°C",
+        "31°C",
+        "32°C"
+    )
 
     override fun onDestroyView() {
         super.onDestroyView()

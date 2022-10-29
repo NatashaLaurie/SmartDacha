@@ -65,14 +65,14 @@
             android:id="@+id/animationView"
             android:layout_width="64dp"
             android:layout_height="64dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/tvTemp"
             app:layout_constraintEnd_toEndOf="@id/tvTemp"
             app:layout_constraintStart_toStartOf="@id/tvTemp"
             app:layout_constraintTop_toTopOf="@id/tvTemp"
-            app:layout_constraintBottom_toBottomOf="@id/tvTemp"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            app:lottie_rawRes="@raw/animated_dots"
-            android:visibility="invisible"/>
+            app:lottie_rawRes="@raw/animated_dots" />
 
         <TextView
             android:id="@+id/tvTemp"
@@ -137,10 +137,10 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toTopOf="@id/customSwitch"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvSetTemp"
-                app:layout_constraintBottom_toTopOf="@id/customSwitch"
                 app:np_dividerColor="@color/secondaryLightColor"
                 app:np_dividerDistance="100dp"
                 app:np_dividerType="side_lines"
@@ -154,18 +154,28 @@
                 app:np_textSize="24sp"
                 app:np_wheelItemCount="5" />
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/aVPicker"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="@id/tvSetTemp"
+                app:layout_constraintTop_toBottomOf="@+id/numberPicker"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/animated_dots" />
 
             <com.kyleduo.switchbutton.SwitchButton
                 android:id="@+id/customSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
                 app:kswBackColor="@color/secondaryLightColor"
                 app:kswFadeBack="true"
                 app:kswThumbDrawable="@drawable/thumb"
                 app:kswThumbHeight="56dp"
                 app:kswThumbMargin="3dp"
-                android:layout_marginBottom="16dp"
                 app:kswThumbWidth="56dp"
                 app:layout_constraintEnd_toEndOf="@id/tvSetTemp"
                 app:layout_constraintTop_toBottomOf="@+id/numberPicker" />

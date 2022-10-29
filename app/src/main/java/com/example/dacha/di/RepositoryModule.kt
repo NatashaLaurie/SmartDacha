@@ -1,5 +1,6 @@
 package com.example.dacha.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.example.dacha.data.repository.*
 import com.google.firebase.auth.FirebaseAuth
@@ -7,6 +8,7 @@ import com.google.firebase.database.DatabaseReference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -36,8 +38,8 @@ object RepositoryModule {
     @Singleton
     fun providesSwitcherRepository(
         database: DatabaseReference,
-        appPreferences: SharedPreferences
+        @ApplicationContext appContext: Context
     ): SwitcherRepository {
-        return SwitcherRepositoryImpl(database, appPreferences)
+        return SwitcherRepositoryImpl(database, appContext)
     }
 }

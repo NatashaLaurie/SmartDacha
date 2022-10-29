@@ -33,8 +33,15 @@ class FirebaseWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParameters) {
     private val TAG = "FirebaseWorker"
 
-    private suspend fun getData() = withContext(Dispatchers.IO) {
+    private suspend fun getStatus() = withContext(Dispatchers.IO) {
         database.child(FireBaseFields.READY_STATUS)
+            .get()
+            .await()
+            .value
+    }
+
+    private suspend fun getReqTemperature() = withContext(Dispatchers.IO) {
+        database.child(FireBaseFields.REQUIRED_TEMPERATURE)
             .get()
             .await()
             .value
@@ -42,21 +49,28 @@ class FirebaseWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val data = try {
-            getData()
+            getStatus()
         } catch (e: Exception) {
             val errMsg = "Error message"
             Log.e(TAG, errMsg, e)
             return Result.retry()
         }
         if (data as Boolean) {
-            showNotification()
+            val achievedTemperature = try {
+                getReqTemperature()
+            } catch (e: Exception) {
+                val errMsg = "Error message"
+                Log.e(TAG, errMsg, e)
+                return Result.retry()
+            }
+            showNotification(achievedTemperature)
         } else return Result.retry()
         Log.d(TAG, "$data")
         return Result.success()
     }
 
 
-    private fun showNotification() {
+    private fun showNotification(achievedTemperature: Any?) {
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -73,8 +87,7 @@ class FirebaseWorker @AssistedInject constructor(
                 .apply {
                     setContentIntent(pendingIntent)
                 }
-        val achievedTemperature = localPrefs.getString(SharedPrefConstants.REQUIRED_TEMPERATURE, "")
-        notification.setContentTitle("Температура $achievedTemperature достигнута.")
+        notification.setContentTitle("Температура ${achievedTemperature.toString()} достигнута.")
         notification.setContentText("Батареи переведены в автономный режим.")
         notification.setCategory(NotificationCompat.CATEGORY_ALARM)
         notification.setSmallIcon(R.drawable.ic_splash)

@@ -46,7 +46,8 @@ class HeatingRepositoryImpl(
                 result.invoke(
                     UiState.Success(Pair(requiredTemp, "Температура установлена"))
                 )
-                appPreferences.edit().putString(SharedPrefConstants.REQUIRED_TEMPERATURE, requiredTemp).apply()
+                appPreferences.edit()
+                    .putString(SharedPrefConstants.REQUIRED_TEMPERATURE, requiredTemp).apply()
             }
             .addOnFailureListener {
                 result.invoke(
@@ -56,4 +57,5 @@ class HeatingRepositoryImpl(
                 )
             }
     }
+
 }

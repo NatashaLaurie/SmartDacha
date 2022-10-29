@@ -5,12 +5,14 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.example.dacha.data.repository.HeatingRepository
 import com.example.dacha.data.repository.SwitcherRepository
 import com.example.dacha.util.UiState
 import com.example.dacha.worker.FirebaseWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -28,28 +30,37 @@ class MainViewModel @Inject constructor(
         get() = _currentTemperature
 
     private val requiredTemperature = MutableLiveData<UiState<Pair<String, String>>>()
-    private val switcherStatus = MutableLiveData<UiState<String>>()
 
+    private val _switcherStatus = MutableLiveData<UiState<Pair<String, String>>>()
+    val switcherStatus: LiveData<UiState<Pair<String, String>>>
+        get() = _switcherStatus
+
+
+init {
+    fetchSwitcherStatus()
+}
     fun getCurrentTemperature() {
         _currentTemperature.value = UiState.Loading
         heatingRepository.getCurrentTemperature { _currentTemperature.value = it }
     }
 
     fun turnOffHeat() {
-        switcherRepository.turnOffHeat {
-            switcherStatus.value = it
-        }
+        switcherRepository.turnOffHeat()
     }
 
-    fun turnOnHeat() {
-        switcherRepository.turnOnHeat {
-            switcherStatus.value = it
-        }
+    fun turnOnHeat(requiredTemp: String) {
+        switcherRepository.turnOnHeat(requiredTemp){ requiredTemperature.value = it }
     }
 
     fun setRequireTemperature(requiredTemp: String) {
         heatingRepository.setRequiredTemperature(requiredTemp) { requiredTemperature.value = it }
     }
+
+    private fun fetchSwitcherStatus() = viewModelScope.launch {
+        _switcherStatus.value = UiState.Loading
+        switcherRepository.fetchSwitcherStatus { _switcherStatus.value = it }
+    }
+
 
     fun startCheckingStatus() {
         val constraints = Constraints.Builder()
